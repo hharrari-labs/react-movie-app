@@ -9,6 +9,7 @@ const API_END_POINT = "https://api.themoviedb.org/3/"
 const POPULAR_MOVIE_URL =
   "discover/movie?language=fr&sort_by=popularity.desc&include_adult=false&append_to_response=images"
 const API_KEY = "api_key=1f55025027baf12d6a7d4df3501d36c6"
+const SEARCH_URL = "search/movie?language=fr&include_adult=false"
 
 class App extends Component {
   constructor(props) {
@@ -49,16 +50,68 @@ class App extends Component {
         }.bind(this)
       )
   }
+
+  onClickListItem(movie) {
+    this.setState({ currentMovie: movie }, function() {
+      this.applyVideoToCurrentMovie()
+      this.setRecommandation()
+    })
+  }
+
+  setRecommandation() {
+    axios
+      .get(
+        `${API_END_POINT}movie/${
+          this.state.currentMovie.id
+        }/recommendations?&${API_KEY}&language=fr`
+      )
+      .then(
+        function(response) {
+          this.setState({
+            movieList: response.data.results.slice(0, 5)
+          })
+        }.bind(this)
+      )
+  }
+
+  onClickSearch(searchText) {
+    if (searchText) {
+      axios
+        .get(`${API_END_POINT}${SEARCH_URL}&${API_KEY}&query=${searchText}`)
+        .then(
+          function(response) {
+            if (response.data && response.data.results[0]) {
+              if (response.data.results[0].id != this.state.currentMovie.id) {
+                this.setState(
+                  {
+                    currentMovie: response.data.results[0]
+                  },
+                  () => {
+                    this.applyVideoToCurrentMovie()
+                    this.setRecommandation()
+                  }
+                )
+              }
+            }
+          }.bind(this)
+        )
+    }
+  }
   render() {
     const renderVideoList = () => {
       if (this.state.movieList.length >= 5) {
-        return <VideoList movieList={this.state.movieList} />
+        return (
+          <VideoList
+            movieList={this.state.movieList}
+            callback={this.onClickListItem.bind(this)}
+          />
+        )
       }
     }
     return (
       <div>
         <div className="search_bar">
-          <SearchBar />
+          <SearchBar callback={this.onClickSearch.bind(this)} />
         </div>
         <div className="row">
           <div className="col-md-8">
