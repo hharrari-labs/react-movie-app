@@ -8,7 +8,7 @@ import axios from "axios"
 const API_END_POINT = "https://api.themoviedb.org/3/"
 const POPULAR_MOVIE_URL =
   "discover/movie?language=fr&sort_by=popularity.desc&include_adult=false&append_to_response=images"
-const API_KEY = "api_key=1f55025027baf12d6a7d4df3501d36c6"
+const API_KEY = "api_key=YOUR_API_KEY"
 const SEARCH_URL = "search/movie?language=fr&include_adult=false"
 
 class App extends Component {
